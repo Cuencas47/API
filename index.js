@@ -76,12 +76,37 @@ async function acessarPlanilha() {
   }
 }
 
+const json = await acessarPlanilha();
+
+
+
 // Rota que carrega e retorna os dados da planilha
 app.get('/', async (req, res) => {
-  const dados = await acessarPlanilha();
-  res.json(dados);
+  const json = await acessarPlanilha();
+  if (json.erro) return res.status(500).json(json);
+
+  const { setores, absenteismo, motAbs } = json;
+
+  const resultado = absenteismo.map(row => {
+    const setorInfo = setores.find(s => s.cod_setor === row.cod_setor);
+    const motivosDoSetor = motAbs.filter(m => m.cod_setor === row.cod_setor);
+
+    return {
+      cod_setor: row.cod_setor,
+      setor: setorInfo?.setor || '',
+      data: row.data,
+      valor: row.valorAb?.replace('%', '') || '',
+      motivos: motivosDoSetor.map(m => ({
+        motivo: m.motivo,
+        valorM: m.valorMAb?.replace('%', '') || ''
+      }))
+    };
+  });
+
+  res.json(resultado);
 });
 
 app.listen(PORT, () => {
   console.log(`O servidor está rodando na porta ${PORT}`);
 });
+

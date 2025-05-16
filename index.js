@@ -94,12 +94,12 @@ app.get('/', async (req, res) => {
     return {
       cod_setor: row.cod_setor,
       setor: setorInfo?.setor || '',
-      data: row.data,
+      data: row.data?.replace(Date),
       valor: row.valorAb?.replace('%', '') || '',
-      motivos: motivosDoSetor.map(m => ({
-        motivo: m.motivo,
-        valorM: m.valorMAb?.replace('%', '') || ''
-      }))
+      //motivos: motivosDoSetor.map(m => ({
+        //motivo: m.motivo,
+        //valorM: m.valorMAb?.replace('%', '') || ''
+      //}))
     };
   });
 

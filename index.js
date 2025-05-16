@@ -49,7 +49,7 @@ async function acessarPlanilha() {
       for (let colMes = 2; colMes <= 25; colMes++) {
         if (colMes % 2 !== 0) continue;
         const data = meses[colMes - 2];
-      const valor = row._rawData[colMes];
+        const valor = row._rawData[colMes];
 
     // Procurar se já existe no resultado (mesmo setor + data)
     let item = resultado.find(

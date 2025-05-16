@@ -32,7 +32,7 @@ async function acessarPlanilha() {
     const sheet = doc.sheetsByIndex[0];                                               //Acessa a primeira Aba
     console.log(`Título da aba: ${sheet.title}`);                                     
 
-    await sheet.loadCells('A1:Z61');                                                  //Celulas acessadas
+    await sheet.loadCells('A1:Z123');                                                  //Celulas acessadas
     const rows = await sheet.getRows();
     const header = sheet.headerValues;
 
@@ -40,7 +40,7 @@ async function acessarPlanilha() {
 
     const resultado = [];
   
-    for (let rowIndex = 0; rowIndex < rows.length && rowIndex < 61; rowIndex++) {
+    for (let rowIndex = 0; rowIndex < rows.length && rowIndex < 123; rowIndex++) {
       const row = rows[rowIndex];
       const cod_setor = row._rawData[0];
       const setor = row._rawData[1];
@@ -49,15 +49,31 @@ async function acessarPlanilha() {
       for (let colMes = 2; colMes <= 25; colMes++) {
         if (colMes % 2 !== 0) continue;
         const data = meses[colMes - 2];
-        const valorAb = row._rawData[colMes];
-      
-    resultado.push({
-      data,
-      setor,
-      valorAb
-    });       
+      const valor = row._rawData[colMes];
+
+    // Procurar se já existe no resultado (mesmo setor + data)
+    let item = resultado.find(
+      r => r.cod_setor === cod_setor && r.data === data
+    );
+
+    if (!item) {
+      item = {
+        cod_setor,
+        setor,
+        data,
+        valor_absenteismo: null,
+        valor_rotatividade: null
+      };
+      resultado.push(item);
+    }
+
+    if (rowIndex < 61) {
+      item.valor_absenteismo = valor;
+    } else if (rowIndex >= 62) {
+      item.valor_rotatividade = valor;
+    }
   }
-}    
+}
 
   return resultado;
 

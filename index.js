@@ -36,39 +36,30 @@ async function acessarPlanilha() {
     const rows = await sheet.getRows();
     const header = sheet.headerValues;
 
-    const meses = header.slice(2, 19);   // Colunas B a S                             //Acessa o cabeçalho
-    const motivos = header.slice(21, 25); // Colunas V a Z
+    const meses = header.slice(2, 25);   // Colunas B a S - Acessa o cabeçalho
 
-    const setores = [];
-    const absenteismo = [];
-    const motAbs = []; //Motivo do absenteismo
-
+    const resultado = [];
+  
     for (let rowIndex = 0; rowIndex < rows.length && rowIndex < 61; rowIndex++) {
       const row = rows[rowIndex];
       const cod_setor = row._rawData[0];
       const setor = row._rawData[1];
       if (!setor) continue;
-      setores.push({ cod_setor, setor});
 
-      for (let colMes = 2; colMes <= 18; colMes++) {
+      for (let colMes = 2; colMes <= 25; colMes++) {
         if (colMes % 2 !== 0) continue;
         const data = meses[colMes - 2];
         const valorAb = row._rawData[colMes];
-        absenteismo.push({cod_setor, data, valorAb});
-      }    
-        
-        for (let colMotivo = 21; colMotivo <= 25; colMotivo++) {
-        const motivo = motivos[colMotivo - 21];
-        const valorMAb = row._rawData[colMotivo];
-        motAbs.push({cod_setor, motivo, valorMAb});   
-                
-    }   
+      
+    resultado.push({
+      data,
+      setor,
+      valorAb
+    });       
   }
-    return {
-      setores,
-      absenteismo,
-      motAbs
-    }
+}    
+
+  return resultado;
 
   } catch (error) {
     console.error('Erro ao acessar a planilha:', error);
@@ -76,37 +67,16 @@ async function acessarPlanilha() {
   }
 }
 
-const json = await acessarPlanilha();
-
-
+const dados = await acessarPlanilha();
 
 // Rota que carrega e retorna os dados da planilha
 app.get('/', async (req, res) => {
-  const json = await acessarPlanilha();
-  if (json.erro) return res.status(500).json(json);
-
-  const { setores, absenteismo, motAbs } = json;
-
-  const resultado = absenteismo.map(row => {
-    const setorInfo = setores.find(s => s.cod_setor === row.cod_setor);
-    const motivosDoSetor = motAbs.filter(m => m.cod_setor === row.cod_setor);
-
-    return {
-      cod_setor: row.cod_setor,
-      setor: setorInfo?.setor || '',
-      data: row.data?.replace(Date),
-      valor: row.valorAb?.replace('%', '') || '',
-      //motivos: motivosDoSetor.map(m => ({
-        //motivo: m.motivo,
-        //valorM: m.valorMAb?.replace('%', '') || ''
-      //}))
-    };
-  });
-
-  res.json(resultado);
+  const dados = await acessarPlanilha();
+  res.json(dados);
 });
 
 app.listen(PORT, () => {
   console.log(`O servidor está rodando na porta ${PORT}`);
 });
+
 

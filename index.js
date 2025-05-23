@@ -54,7 +54,7 @@ async function acessarPlanilha() {
 
     // Procurar se já existe no resultado (mesmo setor + data)
     let item = resultado.find(
-      r => r.cod_setor === cod_setor && r.data === data
+      r => r.cod_setor === cod_setor && r.data === Periodo
     );
 
     if (!item) {

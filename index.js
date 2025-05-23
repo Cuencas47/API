@@ -48,7 +48,7 @@ async function acessarPlanilha() {
 
       for (let colMes = 2; colMes <= 25; colMes++) {
         if (colMes % 2 !== 0) continue;
-        const data = meses[colMes - 2];
+        const Periodo = meses[colMes - 2];
 
         const valor = row._rawData[colMes];
 
@@ -59,7 +59,7 @@ async function acessarPlanilha() {
 
     if (!item) {
       item = {
-        data,
+        Periodo,
         cod_setor,
         setor,
         valor_absenteismo: null,

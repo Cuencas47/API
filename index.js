@@ -49,6 +49,7 @@ async function acessarPlanilha() {
       for (let colMes = 2; colMes <= 25; colMes++) {
         if (colMes % 2 !== 0) continue;
         const data = meses[colMes - 2];
+
         const valor = row._rawData[colMes];
 
     // Procurar se já existe no resultado (mesmo setor + data)
@@ -58,9 +59,9 @@ async function acessarPlanilha() {
 
     if (!item) {
       item = {
+        data,
         cod_setor,
         setor,
-        data,
         valor_absenteismo: null,
         valor_rotatividade: null
       };
@@ -82,8 +83,6 @@ async function acessarPlanilha() {
     return { erro: 'Falha ao acessar a planilha'};
   }
 }
-
-const dados = await acessarPlanilha();
 
 // Rota que carrega e retorna os dados da planilha
 app.get('/', async (req, res) => {
